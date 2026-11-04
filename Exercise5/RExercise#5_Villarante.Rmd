@@ -1,0 +1,155 @@
+---
+title: "RExercise#5_Villarante"
+author: "Sean Justine Villarante"
+date: "2026-11-04"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part A - Creating Matrices
+```{r}
+m1 <- matrix(1:9, nrow = 3, ncol = 3)
+print(m1)
+```
+```{r}
+m2 <- matrix(1:9, nrow = 3, ncol = 3, byrow = TRUE)
+print(m2)
+```
+```{r}
+scores <- matrix(c(88, 92, 79, 95, 84, 90), nrow = 2, ncol = 3, byrow = TRUE)
+rownames(scores) <- c("Quiz1", "Quiz2")
+colnames(scores) <- c("Ana", "Ben", "Cid")
+print(scores)
+```
+
+## Question #1
+By default, R fills a matrix from top to bottom, one column after another, so 1, 2, 3 end up in the first column of `m1`. Adding `byrow = TRUE` makes R fill from left to right, one row after another, so 1, 2, 3 end up in the first row of `m2`. The numbers and the size are identical, and only the order of placement changes.
+
+## Question #2
+```{r}
+m3 <- matrix(1:8, nrow = 3, ncol = 3)
+print(m3)
+```
+
+R creates the matrix anyway but prints a warning, because 8 values are not enough to fill 9 cells. To finish the grid, it starts over from the first value, so the last cell (row 3, column 3) gets 1. This behavior is called recycling.
+
+# Part B - Subsetting Matrices
+```{r}
+scores[1, 2]
+scores[1, ]
+scores[, "Ben"]
+```
+
+```{r}
+scores[scores >= 90]
+```
+
+## Question #3
+```{r}
+class(scores[1, ])
+class(scores[, "Ben"])
+```
+
+Both return `"numeric"`, so R turns a lone row or column into a simple named vector. It does this automatically because of the default `drop = TRUE`, since a single row or column no longer needs two dimensions. A vector is also easier to work with afterward.
+
+## Question #4
+Picking cells with `scores >= 90` returns only the matching values, which could come from anywhere in the matrix and cannot make a full grid. Because of this, R gives a flat vector without the 2D layout or the names. Meanwhile, `scores[1, ]` returns a whole row, so the column names still fit and remain.
+
+# Part C - Matrix Properties and Operations
+```{r}
+dim(scores)
+nrow(scores)
+ncol(scores)
+```
+
+```{r}
+scores_t <- t(scores)
+scores_t
+dim(scores_t)
+dim(scores)
+```
+
+```{r}
+a <- matrix(1:4, nrow = 2)
+b <- matrix(5:8, nrow = 2)
+a + b
+a * b
+```
+
+```{r}
+a %*% b
+a * b
+```
+
+## Question #5
+With `a * b`, R multiplies the numbers in matching positions of the two matrices. With `a %*% b`, each row of `a` is multiplied with each column of `b`, and the products are summed. So the answers differ, and `%*%` needs the number of columns of `a` to equal the number of rows of `b`.
+
+## Question #6
+Transposing changes the 2 x 3 `scores` into the 3 x 2 `scores_t`, so rows become columns and columns become rows. Since names are labels for the rows and columns, they must move with them. Quiz1 and Quiz2 turn into column names, and Ana, Ben, and Cid turn into row names.
+
+# Part D - cbind() and rbind()
+```{r}
+scores_v2 <- cbind(scores, Dex = c(85, 91))
+scores_v2
+```
+
+```{r}
+scores_v3 <- rbind(scores, Quiz3 = c(80, 88, 93))
+scores_v3
+```
+
+## Question #7
+```{r}
+test <- cbind(scores, c(85, 91, 100))
+test
+```
+
+R gives a warning instead of an error because 3 values do not fit the 2 rows of `scores`. It keeps only 85 and 91 and drops 100, so information is lost. `cbind()` and `rbind()` need matching dimensions because a matrix has to be a complete rectangle without missing or extra cells.
+
+## Question #8
+I would use `rbind()` when new records have the same variables as the existing data, such as a daily sales table with Product A, B, and C columns. Each new day becomes a new row at the end of the table. The columns stay the same while the rows grow, whereas `cbind()` adds a new variable.
+
+# Part E - Arrays: Creating and Subsetting
+```{r}
+arr <- array(1:12, dim = c(2, 3, 2))
+arr
+```
+```{r}
+arr[1, 2, 2]
+arr[ , , 1]
+```
+```{r}
+dim(arr)
+```
+
+## Question #9
+`dim(arr)` gives 2, 3, 2, meaning 2 rows, 3 columns, and 2 layers. A layer is one of the stacked grids with the same size. This is why `arr[row, col, layer]` needs three numbers to find one value.
+
+## Question #10
+Weekly quiz scores are a good example: students are the rows, quizzes are the columns, and each week is a layer. A 2D matrix can only hold one week's grid. You would have to keep a separate matrix for every week instead of storing everything in one array.
+
+# Part F - Critical Thinking Challenge
+```{r}
+class_a <- matrix(c(85, 90, 78, 92), nrow = 2, byrow = TRUE,
+                  dimnames = list(c("S1", "S2"), c("Midterm", "Final")))
+class_b <- matrix(c(88, 84, 95, 91), nrow = 2, byrow = TRUE,
+                  dimnames = list(c("S3", "S4"), c("Midterm", "Final")))
+
+all_students <- rbind(class_a, class_b)
+all_students
+```
+
+```{r}
+rowMeans(all_students)
+```
+
+## Question #11
+I chose `rbind()` because both matrices share the same column names (Midterm and Final) while their row names are different. This means they contain different students who took the same exams. New students belong in new rows, so stacking them was correct.
+
+## Question #12
+I would combine the 5 matrices using `rbind()`, stacking one under another, since each has the same Midterm and Final columns and each class adds more students. Then `dim()` shows 2 columns, and the number of rows should equal all the students from the 5 classes added together.
+
+# Conclusion
+A matrix has only rows and columns, while an array is better than two dimensions by adding layers, and both hold a single data type. A matrix suits one table, while an array suits several tables of the same size, like one per week. `cbind()` and `rbind()` help when a dataset grows, for example when I add new students or new quiz scores to a class record.

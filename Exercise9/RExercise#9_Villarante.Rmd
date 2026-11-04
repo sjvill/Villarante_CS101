@@ -1,0 +1,136 @@
+---
+title: "RExercise#9_Villarante"
+author: "Sean Justine Villarante"
+date: "2026-11-04"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part A — Creating Data Frames
+## Question #1
+### a. Create the data frame and save it as shoesize.csv
+```{r}
+shoe_data <- data.frame(
+  shoe_size = c(6.5, 9.0, 8.5, 8.5, 10.5, 7.0, 9.5, 9.0, 13.0, 7.5, 10.5, 8.5, 12.0, 10.5,
+                13.0, 11.5, 8.5, 5.0, 10.0, 6.5, 7.5, 8.5, 10.5, 8.5, 10.5, 11.0, 9.0, 13.0),
+  height = c(66.0, 68.0, 64.5, 65.0, 70.0, 64.0, 70.0, 71.0, 72.0, 64.0, 74.5, 67.0, 71.0, 71.0,
+             77.0, 72.0, 59.0, 62.0, 72.0, 66.0, 64.0, 67.0, 73.0, 69.0, 72.0, 70.0, 69.0, 70.0),
+  gender = c("F", "F", "F", "F", "M", "F", "F", "F", "M", "F", "M", "F", "M", "M",
+             "M", "M", "F", "F", "M", "F", "F", "M", "M", "F", "M", "M", "M", "M")
+)
+
+write.csv(shoe_data, "shoesize.csv", row.names = FALSE)
+```
+
+### b. Import the saved CSV and display the last 5 rows
+```{r}
+shoe_import <- read.csv("shoesize.csv")
+tail(shoe_import, 5)
+```
+
+### c. Describe the data (structure and content)
+```{r}
+str(shoe_import)
+head(shoe_import)
+```
+
+### d. Dimensions
+```{r}
+dim(shoe_import)
+nrow(shoe_import)
+ncol(shoe_import)
+```
+The data frame has 28 rows and 3 columns.
+
+### e. summary() compared to str()
+```{r}
+summary(shoe_import)
+```
+`str()` displays the structure of the data, including the type of each column and a preview of its first few values.
+`summary()` provides basic stats like the minimum, quartiles, median, mean, and maximum for numeric columns.
+
+### f. Subsets for males and females
+
+```{r}
+males <- subset(shoe_import, gender == "M", select = c(shoe_size, height))
+females <- subset(shoe_import, gender == "F", select = c(shoe_size, height))
+
+males
+females
+```
+
+### g. Mean of shoe size and height
+
+```{r}
+mean(shoe_import$shoe_size)
+mean(shoe_import$height)
+```
+
+### h. Relationship between shoe size and height
+```{r}
+cor(shoe_import$shoe_size, shoe_import$height)
+
+plot(shoe_import$shoe_size, shoe_import$height,
+     xlab = "Shoe Size", ylab = "Height",
+     main = "Shoe Size vs Height")
+abline(lm(height ~ shoe_size, data = shoe_import))
+```
+Yes, shoe size and height share a strong positive connection (around 0.78), meaning the points on the plot slant upward from left to right. Since people with larger feet are generally taller, these two measurements tend to increase together.
+
+## Question #2
+```{r}
+shoe_import$gender <- factor(shoe_import$gender)
+
+shoe_import$gender
+levels(shoe_import$gender)
+str(shoe_import)
+```
+The gender column is now a factor with two levels, F and M, which work as labels. Gender is a nominal variable, so the levels have no order and neither category is higher than the other.
+
+## Question #3
+When you knit, R uses the .Rmd file's location as the working directory, making relative file paths like "shoesize.csv" reliable. Anyone using the file just needs to save the dataset in the same folder for the code to execute properly. This ensures the document remains reproducible across different setups without modifying file paths.
+
+## Question #4
+```{r}
+shoe_import <- read.csv("shoesize.csv")
+str(shoe_import)
+```
+
+The gender column was imported as character (chr), which is expected because its values are letters. If a numeric column like shoe_size were read as character because of a stray text value, functions such as `mean()` and `cor()` would fail or give wrong results. Sorting would also become alphabetical, so "10.5" would come before "9.0".
+
+## Question #5
+```{r}
+head(shoe_import)
+tail(shoe_import)
+```
+`head()` only shows the start of the data, so errors near the end can be missed. Using
+`tail()` too can reveal issues like blank rows, footer notes, or missing data at the bottom.
+Checking both ends gives more confidence that the full file was imported correctly.
+
+## Question #6
+### a. Correlation
+```{r}
+cor(shoe_import$shoe_size, shoe_import$height)
+```
+The correlation is about 0.78, which shows a strong link between shoe size and height. People with bigger shoe sizes are usually taller.
+
+### b. Shoe size greater than or equal to 11
+```{r}
+shoe_import[shoe_import$shoe_size >= 11, ]
+```
+Six respondents have a shoe size of 11 or higher, and all of them are male.
+
+## Question #7
+```{r}
+mean(females$shoe_size)
+mean(females$height)
+mean(males$shoe_size)
+mean(males$height)
+
+# optional: correlation within each group
+cor(females$shoe_size, females$height)
+cor(males$shoe_size, males$height)
+```
+Males generally have larger feet and are taller than females (averaging size 10.96 and 71.46 inches vs. 7.86 and 65.68 inches). While a positive trend between height and shoe size persists within each gender (correlation 0.5), it is noticeably weaker than the global correlation of 0.78. Because gender explains a significant portion of this connection, it should be controlled or evaluated independently.

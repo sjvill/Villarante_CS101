@@ -1,0 +1,237 @@
+---
+title: "Practical Exam"
+author: "Sean Justine Villarante"
+date: "2026-11-11"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part A
+```{r}
+#A1
+v <- seq(5, 50, by = 5)
+length(v)
+sum(v)
+mean(v)
+```
+
+```{r}
+#A2
+w <- rep(c(1, 2, 3), times = 4)
+z <- rep(c(1, 2, 3), each = 4)
+w
+z
+```
+
+```{r}
+#A3
+17 %% 5
+17 %/% 5
+2^10
+sqrt(144)
+round(pi, 3)
+```
+
+```{r}
+#A4
+a <- c(2, 4, 6, 8)
+b <- c(1, 3, 5, 7)
+
+a + b
+a * b
+a > b
+sum(a * b)
+```
+
+```{r}
+#A5
+print(paste("Student", 1:3, sep = "-"))
+
+print(class(42))
+print(class(42L))
+print(class("42"))
+print(class(41i))
+print(class(TRUE))
+```
+
+#Part B
+```{r}
+#B1
+students <- data.frame(
+  id = 1:8,
+  name = c("Alice", "Bruno", "Chen", "Dana", "Elif", "Farid", "Grace", "Hiro"),
+  sex = c("F", "M", "M", "F", "F", "M", "F", "M"),
+  section = c("A", "B", "A", "C", "B", "C", "A", "B"),
+  midterm = c(78, 85, 92, 67, 74, 88, 95, 59),
+  final = c(82, 79, 96, 71, 80, 91, 93, 65),
+  attendance = c(95, 88, 100, 72, 90, 85, 98, 60),
+  stringsAsFactors = FALSE
+)
+```
+
+```{r}
+#B2
+str(students)
+dim(students)
+colnames(students)
+summary(students)
+```
+
+```{r}
+#B3
+students$average <- round((students$midterm + students$final) / 2, 1)
+```
+
+```{r}
+#B4
+students$passed <- students$average >= 70 & students$attendance >= 75
+```
+
+```{r}
+#B5
+students$standing <- ifelse(students$average >= 90, "Honors",
+                     ifelse(students$average >= 75, "Good", "Needs Support"))
+```
+
+```{r}
+#B6
+classify <- function(score) {
+  if (score >= 85) {
+    return("Distinction")
+  } else if (score >= 70) {
+    return("Merit")
+  } else if (score >= 50) {
+    return("Pass")
+  } else {
+    return("Fail")
+  }
+}
+
+print(sapply(c(90, 73, 55, 40), classify))
+```
+
+#Part C
+```{r}
+#C1
+new_students <- data.frame(
+  id = c(9, 10),
+  name = c("Ines", "Jamal"),
+  sex = c("F", "M"),
+  section = c("C", "A"),
+  midterm = c(81, 70),
+  final = c(84, 68),
+  attendance = c(92, 80),
+  stringsAsFactors = FALSE
+)
+
+new_students$average <- round((new_students$midterm + new_students$final) / 2, 1)
+new_students$passed <- new_students$average >= 70 & new_students$attendance >= 75
+new_students$standing <- ifelse(new_students$average >= 90, "Honors",
+                         ifelse(new_students$average >= 75, "Good", "Needs Support"))
+
+students_all <- rbind(students, new_students)
+```
+
+```{r}
+#C2
+quiz <- c(8, 7, 10, 6, 7, 9, 10, 5, 8, 6)
+students_all <- cbind(students_all, quiz)
+class(students_all)
+```
+
+```{r}
+#C3
+m <- cbind(midterm = students_all$midterm, final = students_all$final)
+m <- rbind(m, mean = colMeans(m))
+```
+
+```{r}
+#C4
+bad <- data.frame(x = 1, y = 2)
+
+#rbind failed: numbers of columns of arguments do not match
+```
+
+#Part D
+```{r}
+#D1
+students_all$name
+students_all[["name"]]
+students_all[, "name"]
+```
+
+```{r}
+#D2
+students_all[2:5, c("name", "midterm", "final")]
+```
+
+```{r}
+#D3
+students_all[students_all$attendance > 90, ]
+```
+
+```{r}
+#D4
+subset(students_all, sex == "F" & section %in% c("A", "C") & final >= 75, select = c(name, section, final))
+```
+
+```{r}
+#D5
+students_all$name[which.max(students_all$average)]
+students_all$name[which.min(students_all$average)]
+```
+
+```{r}
+#D6
+sorted_students <- students_all[order(-students_all$average), ]
+head(sorted_students, 3)
+```
+
+#Part E
+```{r}
+#E1
+students_all$section <- factor(students_all$section)
+students_all$sex <- factor(students_all$sex)
+
+levels(students_all$section)
+levels(students_all$sex)
+```
+
+```{r}
+#E2
+table(students_all$sex)
+table(students_all$section)
+
+table(students_all$sex, students_all$section)
+
+# A B C
+# F 2 1 1
+# M 1 2 2
+```
+
+```{r}
+#E3
+as.integer(students_all$sex)
+```
+
+```{r}
+#E4
+students_all$sex_label <- factor(students_all$sex, levels = c("F", "M"), labels = c("Female", "Male"))
+levels(students_all$sex_label)
+```
+
+```{r}
+#E5
+summary(students_all$sex_label)
+
+mean(students_all$average[students_all$sex_label == "Female"])
+mean(students_all$average[students_all$sex_label == "Male"])
+```
+
+
+
